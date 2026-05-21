@@ -18,7 +18,6 @@ function ConfirmationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const bookingIdsParam = searchParams.get('bookingIds');
-  const bookingIds = bookingIdsParam ? bookingIdsParam.split(',') : [];
   const { resetStore } = useFlightStore();
 
   const [bookings, setBookings] = useState<BookingDetails[]>([]);
@@ -26,15 +25,17 @@ function ConfirmationContent() {
   const [error, setError]      = useState('');
 
   useEffect(() => {
-    if (bookingIds.length === 0) { router.push('/'); return; }
-    const fetch = async () => {
+    if (!bookingIdsParam) { router.push('/'); return; }
+    const ids = bookingIdsParam.split(',');
+    
+    const fetchBookings = async () => {
       try {
         const { data, error: e } = await supabase.from('bookings').select(`
           id, pnr_code, total_price, booked_at,
           flight:flights(flight_no, origin, destination, departs_at, arrives_at, aircraft_type),
           seat:seats(seat_number, class),
           passengers(full_name, nationality)
-        `).in('id', bookingIds);
+        `).in('id', ids);
         if (e) throw e;
         setBookings(data as any[]);
         resetStore();
@@ -44,7 +45,7 @@ function ConfirmationContent() {
         setLoading(false);
       }
     };
-    fetch();
+    fetchBookings();
   }, [bookingIdsParam, router, resetStore]);
 
   if (loading) return (
