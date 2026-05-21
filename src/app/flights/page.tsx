@@ -1,19 +1,57 @@
-import { createClient } from '@/lib/supabaseServer';
+'use client';
+
+import { useEffect, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { supabase } from '@/lib/supabaseClient';
 import FlightResultsList from '@/components/booking/FlightResultsList';
 import Link from 'next/link';
 import { Plane, ArrowRight, Calendar, Users, Search } from 'lucide-react';
 
-interface SearchParams {
-  origin?: string;
-  destination?: string;
-  date?: string;
-  passengers?: string;
-}
+function FlightSearchContent() {
+  const searchParams = useSearchParams();
+  const origin = searchParams.get('origin');
+  const destination = searchParams.get('destination');
+  const date = searchParams.get('date');
+  const passengers = searchParams.get('passengers');
 
-export const revalidate = 0;
+  const [flights, setFlights] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<any>(null);
 
-export default async function FlightsPage({ searchParams }: { searchParams: SearchParams }) {
-  const { origin, destination, date, passengers } = searchParams;
+  useEffect(() => {
+    async function fetchFlights() {
+      if (!origin || !destination || !date) {
+        setLoading(false);
+        return;
+      }
+
+      console.log('fetchFlights() executing for:', { origin, destination, date });
+      setLoading(true);
+      
+      const startOfDay = `${date}T00:00:00Z`;
+      const endOfDay = `${date}T23:59:59Z`;
+
+      const { data, error: fetchError } = await supabase
+        .from('flights')
+        .select('*')
+        .eq('origin', origin)
+        .eq('destination', destination)
+        .gte('departs_at', startOfDay)
+        .lte('departs_at', endOfDay)
+        .order('departs_at', { ascending: true });
+
+      if (fetchError) {
+        console.error('Supabase query error:', fetchError);
+        setError(fetchError);
+      } else {
+        console.log('Supabase query succeeded, flights found:', data?.length);
+        setFlights(data || []);
+      }
+      setLoading(false);
+    }
+
+    fetchFlights();
+  }, [origin, destination, date]);
 
   if (!origin || !destination || !date) {
     return (
@@ -28,20 +66,6 @@ export default async function FlightsPage({ searchParams }: { searchParams: Sear
       </div>
     );
   }
-
-  const supabase = createClient();
-
-  const startOfDay = `${date}T00:00:00Z`;
-  const endOfDay = `${date}T23:59:59Z`;
-
-  const { data: flights, error } = await supabase
-    .from('flights')
-    .select('*')
-    .eq('origin', origin)
-    .eq('destination', destination)
-    .gte('departs_at', startOfDay)
-    .lte('departs_at', endOfDay)
-    .order('departs_at', { ascending: true });
 
   const passengersCount = parseInt(passengers || '1', 10);
 
@@ -78,7 +102,7 @@ export default async function FlightsPage({ searchParams }: { searchParams: Sear
               style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
               <Users className="h-3.5 w-3.5" /> {passengersCount} Passenger{passengersCount > 1 ? 's' : ''}
             </div>
-            {flights && flights.length > 0 && (
+            {!loading && flights.length > 0 && (
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold"
                 style={{ background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.2)', color: '#f5a623' }}>
                 <Plane className="h-3.5 w-3.5" /> {flights.length} Flight{flights.length !== 1 ? 's' : ''} Found
@@ -100,14 +124,32 @@ export default async function FlightsPage({ searchParams }: { searchParams: Sear
       </div>
 
       {/* Results */}
-      {error ? (
+      {loading ? (
+        <div className="text-center p-12">
+          <div className="w-8 h-8 border-4 border-[#f5a623] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-400 font-medium">Fetching flights...</p>
+        </div>
+      ) : error ? (
         <div className="text-red-300 text-center p-6 rounded-2xl" style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)' }}>
           <p className="font-semibold">Unable to fetch flights</p>
           <p className="text-xs text-red-500 mt-1">{error.message}</p>
         </div>
       ) : (
-        <FlightResultsList flights={flights || []} />
+        <FlightResultsList flights={flights} />
       )}
     </div>
+  );
+}
+
+export default function FlightsPage() {
+  return (
+    <Suspense fallback={
+      <div className="max-w-5xl mx-auto py-16 px-4 text-center">
+        <div className="w-8 h-8 border-4 border-[#f5a623] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-gray-400 font-medium">Loading flight search...</p>
+      </div>
+    }>
+      <FlightSearchContent />
+    </Suspense>
   );
 }
