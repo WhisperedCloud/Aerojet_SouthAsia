@@ -1,73 +1,67 @@
 -- ─────────────────────────────────────────────────────────────────
--- AeroJet Expanded Flight Schedule Seed
--- Covers today + next 7 days across all 8 hubs
+-- AeroJet Dynamic Flight Schedule Seed (15 Days)
+-- Covers today + next 14 days across all 8 hubs
 -- ─────────────────────────────────────────────────────────────────
 
--- JFK <-> LAX  (6 round-trips)
-INSERT INTO flights (id, flight_no, origin, destination, departs_at, arrives_at, aircraft_type, base_price, status) VALUES
-('f1000000-0000-0000-0000-000000000001','AJ101','JFK','LAX', NOW() + INTERVAL  '6 hours',  NOW() + INTERVAL '12 hours', 'Boeing 777',   319.00, 'scheduled'),
-('f1000000-0000-0000-0000-000000000021','AJ103','JFK','LAX', NOW() + INTERVAL '10 hours',  NOW() + INTERVAL '16 hours', 'Boeing 787',   289.00, 'scheduled'),
-('f1000000-0000-0000-0000-000000000022','AJ105','JFK','LAX', NOW() + INTERVAL '18 hours',  NOW() + INTERVAL '24 hours', 'Airbus A350',  349.00, 'scheduled'),
-('f1000000-0000-0000-0000-000000000002','AJ102','LAX','JFK', NOW() + INTERVAL  '8 hours',  NOW() + INTERVAL '14 hours', 'Boeing 777',   329.00, 'scheduled'),
-('f1000000-0000-0000-0000-000000000023','AJ104','LAX','JFK', NOW() + INTERVAL '14 hours',  NOW() + INTERVAL '20 hours', 'Boeing 787',   279.00, 'scheduled'),
-('f1000000-0000-0000-0000-000000000024','AJ106','LAX','JFK', NOW() + INTERVAL '22 hours',  NOW() + INTERVAL '28 hours', 'Airbus A350',  359.00, 'scheduled'),
+DO $$
+DECLARE
+  d INT;
+  flight_date DATE;
+  suffix VARCHAR;
+BEGIN
+  -- Generate flights for 15 days starting from today
+  FOR d IN 0..14 LOOP
+    flight_date := CURRENT_DATE + d;
+    suffix := to_char(flight_date, 'MMDD');
 
--- JFK <-> LAX next day
-('f2000000-0000-0000-0000-000000000001','AJ111','JFK','LAX', NOW() + INTERVAL '1 day 6 hours',  NOW() + INTERVAL '1 day 12 hours', 'Boeing 777',  309.00, 'scheduled'),
-('f2000000-0000-0000-0000-000000000002','AJ112','JFK','LAX', NOW() + INTERVAL '1 day 14 hours', NOW() + INTERVAL '1 day 20 hours', 'Boeing 737',  249.00, 'scheduled'),
-('f2000000-0000-0000-0000-000000000003','AJ113','LAX','JFK', NOW() + INTERVAL '1 day 7 hours',  NOW() + INTERVAL '1 day 13 hours', 'Airbus A350', 339.00, 'scheduled'),
-('f2000000-0000-0000-0000-000000000004','AJ114','LAX','JFK', NOW() + INTERVAL '1 day 16 hours', NOW() + INTERVAL '1 day 22 hours', 'Boeing 787',  295.00, 'scheduled'),
+    INSERT INTO flights (id, flight_no, origin, destination, departs_at, arrives_at, aircraft_type, base_price, status) VALUES
+    -- JFK <-> LAX
+    (gen_random_uuid(), 'AJ101' || suffix, 'JFK', 'LAX', flight_date + interval '6 hours', flight_date + interval '12 hours', 'Boeing 777', 319.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ103' || suffix, 'JFK', 'LAX', flight_date + interval '10 hours', flight_date + interval '16 hours', 'Boeing 787', 289.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ105' || suffix, 'JFK', 'LAX', flight_date + interval '18 hours', flight_date + interval '24 hours', 'Airbus A350', 349.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ102' || suffix, 'LAX', 'JFK', flight_date + interval '8 hours', flight_date + interval '14 hours', 'Boeing 777', 329.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ104' || suffix, 'LAX', 'JFK', flight_date + interval '14 hours', flight_date + interval '20 hours', 'Boeing 787', 279.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ106' || suffix, 'LAX', 'JFK', flight_date + interval '22 hours', flight_date + interval '28 hours', 'Airbus A350', 359.00, 'scheduled'),
 
--- ORD <-> MIA (4 round-trips spread across 2 days)
-('f1000000-0000-0000-0000-000000000003','AJ201','ORD','MIA', NOW() + INTERVAL  '4 hours',  NOW() + INTERVAL  '7 hours', 'Airbus A320', 199.00, 'scheduled'),
-('f1000000-0000-0000-0000-000000000025','AJ203','ORD','MIA', NOW() + INTERVAL '12 hours',  NOW() + INTERVAL '15 hours', 'Airbus A321', 219.00, 'scheduled'),
-('f1000000-0000-0000-0000-000000000004','AJ202','MIA','ORD', NOW() + INTERVAL  '6 hours',  NOW() + INTERVAL  '9 hours', 'Airbus A320', 199.00, 'scheduled'),
-('f1000000-0000-0000-0000-000000000026','AJ204','MIA','ORD', NOW() + INTERVAL '15 hours',  NOW() + INTERVAL '18 hours', 'Airbus A321', 229.00, 'scheduled'),
-('f2000000-0000-0000-0000-000000000005','AJ211','ORD','MIA', NOW() + INTERVAL '1 day 5 hours',  NOW() + INTERVAL '1 day 8 hours',  'Airbus A321', 209.00, 'scheduled'),
-('f2000000-0000-0000-0000-000000000006','AJ212','MIA','ORD', NOW() + INTERVAL '1 day 10 hours', NOW() + INTERVAL '1 day 13 hours', 'Airbus A320', 199.00, 'scheduled'),
+    -- ORD <-> MIA
+    (gen_random_uuid(), 'AJ201' || suffix, 'ORD', 'MIA', flight_date + interval '4 hours', flight_date + interval '7 hours', 'Airbus A320', 199.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ203' || suffix, 'ORD', 'MIA', flight_date + interval '12 hours', flight_date + interval '15 hours', 'Airbus A321', 219.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ202' || suffix, 'MIA', 'ORD', flight_date + interval '6 hours', flight_date + interval '9 hours', 'Airbus A320', 199.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ204' || suffix, 'MIA', 'ORD', flight_date + interval '15 hours', flight_date + interval '18 hours', 'Airbus A321', 229.00, 'scheduled'),
 
--- SFO <-> SEA (4 round-trips)
-('f1000000-0000-0000-0000-000000000005','AJ301','SFO','SEA', NOW() + INTERVAL  '3 hours',  NOW() + INTERVAL  '5 hours', 'Boeing 737',  139.00, 'scheduled'),
-('f1000000-0000-0000-0000-000000000027','AJ303','SFO','SEA', NOW() + INTERVAL '10 hours',  NOW() + INTERVAL '12 hours', 'Boeing 737',  159.00, 'scheduled'),
-('f1000000-0000-0000-0000-000000000006','AJ302','SEA','SFO', NOW() + INTERVAL  '5 hours',  NOW() + INTERVAL  '7 hours', 'Boeing 737',  149.00, 'scheduled'),
-('f1000000-0000-0000-0000-000000000028','AJ304','SEA','SFO', NOW() + INTERVAL '13 hours',  NOW() + INTERVAL '15 hours', 'Boeing 737',  145.00, 'scheduled'),
-('f2000000-0000-0000-0000-000000000007','AJ311','SFO','SEA', NOW() + INTERVAL '1 day 6 hours',  NOW() + INTERVAL '1 day 8 hours',  'Airbus A320', 169.00, 'scheduled'),
-('f2000000-0000-0000-0000-000000000008','AJ312','SEA','SFO', NOW() + INTERVAL '1 day 9 hours',  NOW() + INTERVAL '1 day 11 hours', 'Airbus A320', 155.00, 'scheduled'),
+    -- SFO <-> SEA
+    (gen_random_uuid(), 'AJ301' || suffix, 'SFO', 'SEA', flight_date + interval '3 hours', flight_date + interval '5 hours', 'Boeing 737', 139.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ303' || suffix, 'SFO', 'SEA', flight_date + interval '10 hours', flight_date + interval '12 hours', 'Boeing 737', 159.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ302' || suffix, 'SEA', 'SFO', flight_date + interval '5 hours', flight_date + interval '7 hours', 'Boeing 737', 149.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ304' || suffix, 'SEA', 'SFO', flight_date + interval '13 hours', flight_date + interval '15 hours', 'Boeing 737', 145.00, 'scheduled'),
 
--- DFW <-> DEN (4 round-trips)
-('f1000000-0000-0000-0000-000000000007','AJ401','DFW','DEN', NOW() + INTERVAL  '5 hours',  NOW() + INTERVAL  '7 hours', 'Airbus A321', 169.00, 'scheduled'),
-('f1000000-0000-0000-0000-000000000029','AJ403','DFW','DEN', NOW() + INTERVAL '14 hours',  NOW() + INTERVAL '16 hours', 'Boeing 737',  149.00, 'scheduled'),
-('f1000000-0000-0000-0000-000000000008','AJ402','DEN','DFW', NOW() + INTERVAL  '9 hours',  NOW() + INTERVAL '11 hours', 'Airbus A321', 169.00, 'scheduled'),
-('f1000000-0000-0000-0000-000000000030','AJ404','DEN','DFW', NOW() + INTERVAL '17 hours',  NOW() + INTERVAL '19 hours', 'Boeing 737',  159.00, 'scheduled'),
-('f2000000-0000-0000-0000-000000000009','AJ411','DFW','DEN', NOW() + INTERVAL '1 day 7 hours',  NOW() + INTERVAL '1 day 9 hours',  'Airbus A321', 179.00, 'scheduled'),
-('f2000000-0000-0000-0000-000000000010','AJ412','DEN','DFW', NOW() + INTERVAL '1 day 12 hours', NOW() + INTERVAL '1 day 14 hours', 'Boeing 737',  155.00, 'scheduled'),
+    -- DFW <-> DEN
+    (gen_random_uuid(), 'AJ401' || suffix, 'DFW', 'DEN', flight_date + interval '5 hours', flight_date + interval '7 hours', 'Airbus A321', 169.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ403' || suffix, 'DFW', 'DEN', flight_date + interval '14 hours', flight_date + interval '16 hours', 'Boeing 737', 149.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ402' || suffix, 'DEN', 'DFW', flight_date + interval '9 hours', flight_date + interval '11 hours', 'Airbus A321', 169.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ404' || suffix, 'DEN', 'DFW', flight_date + interval '17 hours', flight_date + interval '19 hours', 'Boeing 737', 159.00, 'scheduled'),
 
--- ORD <-> JFK (new routes)
-('f3000000-0000-0000-0000-000000000001','AJ501','ORD','JFK', NOW() + INTERVAL  '4 hours',  NOW() + INTERVAL  '6 hours', 'Boeing 737',  189.00, 'scheduled'),
-('f3000000-0000-0000-0000-000000000002','AJ502','JFK','ORD', NOW() + INTERVAL  '8 hours',  NOW() + INTERVAL '10 hours', 'Boeing 737',  179.00, 'scheduled'),
-('f3000000-0000-0000-0000-000000000003','AJ503','ORD','JFK', NOW() + INTERVAL '16 hours',  NOW() + INTERVAL '18 hours', 'Airbus A320', 209.00, 'scheduled'),
-('f3000000-0000-0000-0000-000000000004','AJ504','JFK','ORD', NOW() + INTERVAL '20 hours',  NOW() + INTERVAL '22 hours', 'Airbus A320', 199.00, 'scheduled'),
-('f3000000-0000-0000-0000-000000000005','AJ511','ORD','JFK', NOW() + INTERVAL '1 day 5 hours',  NOW() + INTERVAL '1 day 7 hours',  'Boeing 737',  185.00, 'scheduled'),
-('f3000000-0000-0000-0000-000000000006','AJ512','JFK','ORD', NOW() + INTERVAL '1 day 10 hours', NOW() + INTERVAL '1 day 12 hours', 'Airbus A321', 195.00, 'scheduled'),
+    -- ORD <-> JFK
+    (gen_random_uuid(), 'AJ501' || suffix, 'ORD', 'JFK', flight_date + interval '4 hours', flight_date + interval '6 hours', 'Boeing 737', 189.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ503' || suffix, 'ORD', 'JFK', flight_date + interval '16 hours', flight_date + interval '18 hours', 'Airbus A320', 209.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ502' || suffix, 'JFK', 'ORD', flight_date + interval '8 hours', flight_date + interval '10 hours', 'Boeing 737', 179.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ504' || suffix, 'JFK', 'ORD', flight_date + interval '20 hours', flight_date + interval '22 hours', 'Airbus A320', 199.00, 'scheduled'),
 
--- SFO <-> LAX (new short-haul)
-('f4000000-0000-0000-0000-000000000001','AJ601','SFO','LAX', NOW() + INTERVAL  '2 hours',  NOW() + INTERVAL  '3 hours', 'Boeing 737',   89.00, 'scheduled'),
-('f4000000-0000-0000-0000-000000000002','AJ602','LAX','SFO', NOW() + INTERVAL  '5 hours',  NOW() + INTERVAL  '6 hours', 'Boeing 737',   89.00, 'scheduled'),
-('f4000000-0000-0000-0000-000000000003','AJ603','SFO','LAX', NOW() + INTERVAL  '9 hours',  NOW() + INTERVAL '10 hours', 'Airbus A320', 109.00, 'scheduled'),
-('f4000000-0000-0000-0000-000000000004','AJ604','LAX','SFO', NOW() + INTERVAL '13 hours',  NOW() + INTERVAL '14 hours', 'Airbus A320', 109.00, 'scheduled'),
-('f4000000-0000-0000-0000-000000000005','AJ605','SFO','LAX', NOW() + INTERVAL '20 hours',  NOW() + INTERVAL '21 hours', 'Boeing 737',   99.00, 'scheduled'),
-('f4000000-0000-0000-0000-000000000006','AJ611','SFO','LAX', NOW() + INTERVAL '1 day 7 hours',  NOW() + INTERVAL '1 day 8 hours',  'Boeing 737',   95.00, 'scheduled'),
-('f4000000-0000-0000-0000-000000000007','AJ612','LAX','SFO', NOW() + INTERVAL '1 day 12 hours', NOW() + INTERVAL '1 day 13 hours', 'Airbus A320', 105.00, 'scheduled'),
+    -- SFO <-> LAX
+    (gen_random_uuid(), 'AJ601' || suffix, 'SFO', 'LAX', flight_date + interval '2 hours', flight_date + interval '3 hours', 'Boeing 737', 89.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ603' || suffix, 'SFO', 'LAX', flight_date + interval '9 hours', flight_date + interval '10 hours', 'Airbus A320', 109.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ605' || suffix, 'SFO', 'LAX', flight_date + interval '20 hours', flight_date + interval '21 hours', 'Boeing 737', 99.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ602' || suffix, 'LAX', 'SFO', flight_date + interval '5 hours', flight_date + interval '6 hours', 'Boeing 737', 89.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ604' || suffix, 'LAX', 'SFO', flight_date + interval '13 hours', flight_date + interval '14 hours', 'Airbus A320', 109.00, 'scheduled'),
 
--- MIA <-> JFK
-('f5000000-0000-0000-0000-000000000001','AJ701','MIA','JFK', NOW() + INTERVAL  '3 hours',  NOW() + INTERVAL  '6 hours', 'Boeing 737',  229.00, 'scheduled'),
-('f5000000-0000-0000-0000-000000000002','AJ702','JFK','MIA', NOW() + INTERVAL  '7 hours',  NOW() + INTERVAL '10 hours', 'Boeing 737',  219.00, 'scheduled'),
-('f5000000-0000-0000-0000-000000000003','AJ703','MIA','JFK', NOW() + INTERVAL '15 hours',  NOW() + INTERVAL '18 hours', 'Boeing 777',  259.00, 'scheduled'),
-('f5000000-0000-0000-0000-000000000004','AJ704','JFK','MIA', NOW() + INTERVAL '19 hours',  NOW() + INTERVAL '22 hours', 'Boeing 777',  249.00, 'scheduled'),
-('f5000000-0000-0000-0000-000000000005','AJ711','MIA','JFK', NOW() + INTERVAL '1 day 6 hours',  NOW() + INTERVAL '1 day 9 hours',  'Airbus A321', 239.00, 'scheduled'),
-('f5000000-0000-0000-0000-000000000006','AJ712','JFK','MIA', NOW() + INTERVAL '1 day 11 hours', NOW() + INTERVAL '1 day 14 hours', 'Airbus A321', 229.00, 'scheduled')
-
-ON CONFLICT (id) DO NOTHING;
+    -- MIA <-> JFK
+    (gen_random_uuid(), 'AJ701' || suffix, 'MIA', 'JFK', flight_date + interval '3 hours', flight_date + interval '6 hours', 'Boeing 737', 229.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ703' || suffix, 'MIA', 'JFK', flight_date + interval '15 hours', flight_date + interval '18 hours', 'Boeing 777', 259.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ702' || suffix, 'JFK', 'MIA', flight_date + interval '7 hours', flight_date + interval '10 hours', 'Boeing 737', 219.00, 'scheduled'),
+    (gen_random_uuid(), 'AJ704' || suffix, 'JFK', 'MIA', flight_date + interval '19 hours', flight_date + interval '22 hours', 'Boeing 777', 249.00, 'scheduled')
+    ON CONFLICT (flight_no) DO NOTHING;
+  END LOOP;
+END $$;
 
 -- ─────────────────────────────────────────────────────────────────
 -- Seat map generation for all flights
