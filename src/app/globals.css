@@ -1,0 +1,192 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* ── NEW PALETTE: Deep Cosmos + Ember Gold ── */
+  --bg-base:       #07080f;
+  --bg-surface:    #0d0f1e;
+  --bg-elevated:   #12152a;
+  --bg-card:       rgba(18, 21, 42, 0.7);
+
+  --accent-gold:   #f5a623;
+  --accent-amber:  #e8810a;
+  --accent-teal:   #00d4aa;
+  --accent-rose:   #f06292;
+  --accent-violet: #7c5cbf;
+
+  --text-primary:  #f0f2ff;
+  --text-muted:    #6b7280;
+  --text-soft:     #9ca3af;
+
+  --border:        rgba(255,255,255,0.06);
+  --border-glow:   rgba(245,166,35,0.3);
+
+  --glow-gold:     rgba(245, 166, 35, 0.15);
+  --glow-teal:     rgba(0, 212, 170, 0.12);
+}
+
+/* ── Base ── */
+* { box-sizing: border-box; }
+
+body {
+  color: var(--text-primary);
+  background: var(--bg-base);
+  background-image:
+    radial-gradient(at 15% 10%, rgba(124, 92, 191, 0.12) 0px, transparent 55%),
+    radial-gradient(at 85% 90%, rgba(0, 212, 170, 0.08) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(245, 166, 35, 0.04) 0px, transparent 70%);
+  background-attachment: fixed;
+  font-family: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+/* ── Glassmorphism ── */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+}
+
+/* ── Gold glow card ── */
+.gold-card {
+  background: linear-gradient(135deg, rgba(245,166,35,0.06) 0%, rgba(18,21,42,0.8) 100%);
+  border: 1px solid rgba(245,166,35,0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ── Gradient text ── */
+.gradient-gold {
+  background: linear-gradient(135deg, #f5a623 0%, #ffd166 60%, #e8810a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-teal {
+  background: linear-gradient(135deg, #00d4aa 0%, #4cc9f0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Scrollbar ── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Tooltip ── */
+.tooltip-container { position: relative; }
+.tooltip-text {
+  visibility: hidden;
+  position: absolute;
+  z-index: 50;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+
+/* ── Animations ── */
+@keyframes spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes spin-reverse-slow {
+  0% { transform: rotate(360deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.3; transform: scale(1); filter: blur(40px); }
+  50% { opacity: 0.7; transform: scale(1.15); filter: blur(60px); }
+}
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.2; }
+  50% { opacity: 0.6; }
+  100% { transform: scale(1.05); opacity: 0.2; }
+}
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-spin-slow         { animation: spin-slow 25s linear infinite; }
+.animate-spin-reverse-slow { animation: spin-reverse-slow 35s linear infinite; }
+.animate-float             { animation: float 5s ease-in-out infinite; }
+.animate-pulse-glow        { animation: pulse-glow 8s ease-in-out infinite; }
+.animate-pulse-ring        { animation: pulse-ring 4s ease-in-out infinite; }
+.animate-slide-up          { animation: slide-up 0.5s ease-out both; }
+.animate-fade-in           { animation: fade-in 0.4s ease-out both; }
+
+/* ── Shimmer button ── */
+.btn-gold {
+  background: linear-gradient(135deg, #f5a623 0%, #ffd166 50%, #e8810a 100%);
+  background-size: 200% auto;
+  transition: background-position 0.4s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 20px rgba(245, 166, 35, 0.3);
+}
+.btn-gold:hover {
+  background-position: right center;
+  box-shadow: 0 8px 30px rgba(245, 166, 35, 0.5);
+  transform: translateY(-1px);
+}
+.btn-gold:active { transform: scale(0.97); }
+
+/* ── Teal CTA ── */
+.btn-teal {
+  background: linear-gradient(135deg, #00d4aa 0%, #4cc9f0 100%);
+  box-shadow: 0 4px 20px rgba(0, 212, 170, 0.25);
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+.btn-teal:hover {
+  box-shadow: 0 8px 30px rgba(0, 212, 170, 0.45);
+  transform: translateY(-1px);
+}
+
+/* ── Magic Rings ── */
+.magic-rings-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── Flight card hover glow ── */
+.flight-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+}
+.flight-card:hover {
+  border-color: rgba(245,166,35,0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(245,166,35,0.12), 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* ── Status badges ── */
+.badge-on-time    { background: rgba(0,212,170,0.12); color: #00d4aa; border: 1px solid rgba(0,212,170,0.25); }
+.badge-delayed    { background: rgba(240,98,146,0.12); color: #f06292; border: 1px solid rgba(240,98,146,0.25); }
+.badge-cancelled  { background: rgba(239,68,68,0.12);  color: #ef4444; border: 1px solid rgba(239,68,68,0.25); }
+.badge-boarding   { background: rgba(245,166,35,0.12); color: #f5a623; border: 1px solid rgba(245,166,35,0.25); }
